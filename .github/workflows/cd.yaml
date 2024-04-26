@@ -25,7 +25,7 @@ jobs:
       - run: cargo install wasm-bindgen-cli@0.2.92 wasm-opt@0.116.1
       - run: wasm-bindgen --no-typescript --target web --out-dir ./build/ --out-name froggy ./target/wasm32-unknown-unknown/release/froggy.wasm
       - run: wasm-opt ./build/froggy_bg.wasm -o ./build/froggy_bg.wasm -Oz
-      - uses: peaceiris/actions-gh-pages@v4
+      - uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./build
