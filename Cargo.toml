@@ -18,6 +18,10 @@ resolver = "2"
 [dependencies]
 bevy = "0.13.2"
 
+[build-dependencies]
+wasm-bindgen-cli = "0.2.92"
+wasm-opt = "0.116.1"
+
 # Enable a small amount of optimization in debug mode
 [profile.dev]
 opt-level = 1
@@ -25,3 +29,7 @@ opt-level = 1
 # Enable high optimizations for dependencies (incl. Bevy), but not for our code:
 [profile.dev.package."*"]
 opt-level = 3
+
+# Optimize release binaries for size.
+[profile.release]
+opt-level = "z"
