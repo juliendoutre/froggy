@@ -4,28 +4,38 @@ on:
   push:
     branches:
       - main
-  workflow_run:
-    workflows:
-      - CI
-    types:
-      - completed
 
 permissions:
-  contents: write
+  contents: read
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
 
 jobs:
-  release-wasm:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+  build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
+      - uses: actions/checkout@v4
       - run: rustup update stable && rustup default stable
       - run: rustup target install wasm32-unknown-unknown
       - run: cargo build --release --target wasm32-unknown-unknown
       - run: cargo install wasm-bindgen-cli@0.2.92 wasm-opt@0.116.1
       - run: wasm-bindgen --no-typescript --target web --out-dir ./build/ --out-name froggy ./target/wasm32-unknown-unknown/release/froggy.wasm
       - run: wasm-opt ./build/froggy_bg.wasm -o ./build/froggy_bg.wasm -Oz
-      - uses: peaceiris/actions-gh-pages@v3
+      - uses: actions/configure-pages@v4
+      - uses: actions/upload-pages-artifact@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./build
+          path: ./build
+  deploy:
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/deploy-pages@v4
+        id: deployment
