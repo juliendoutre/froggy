@@ -5,3 +5,9 @@
 A video game written in Rust with [Bevy](https://bevyengine.org/).
 
 Check the online version at https://juliendoutre.github.io/froggy.
+
+## Run locally
+
+```shell
+cargo run
+```
