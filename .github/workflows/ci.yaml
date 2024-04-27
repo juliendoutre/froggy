@@ -99,4 +99,4 @@ jobs:
             target/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
       - run: rustup update stable && rustup default stable
-      - run: cargo update -p cargo --locked
+      - run: cargo update --locked
