@@ -1,53 +1,35 @@
+mod game;
+mod menu;
+mod splash;
+
 use bevy::prelude::*;
 
-#[derive(Resource)]
-struct GreetTimer(Timer);
+const TEXT_COLOR: Color = Color::rgb(0.9, 0.9, 0.9);
 
-#[derive(Component)]
-struct Person;
-
-#[derive(Component)]
-struct Name(String);
+#[derive(Clone, Copy, Default, Eq, PartialEq, Debug, Hash, States)]
+enum GameState {
+    #[default]
+    Splash,
+    Menu,
+    Game,
+}
 
 fn main() {
-    App::new().add_plugins((DefaultPlugins, HelloPlugin)).run();
+    App::new()
+        .add_plugins(DefaultPlugins)
+        .init_state::<GameState>()
+        .add_systems(Startup, setup)
+        .add_plugins((splash::plugin, menu::plugin, game::plugin))
+        .run();
 }
 
-pub struct HelloPlugin;
-
-impl Plugin for HelloPlugin {
-    fn build(&self, app: &mut App) {
-        app.insert_resource(GreetTimer(Timer::from_seconds(2.0, TimerMode::Repeating)))
-            .add_systems(Startup, add_people)
-            .add_systems(Update, (hello_world, (update_people, greet_people).chain()));
-    }
+fn setup(mut commands: Commands) {
+    commands.spawn(Camera2dBundle::default());
 }
 
-fn add_people(mut commands: Commands) {
-    commands.spawn((Person, Name("Elaina Proctor".to_string())));
-    commands.spawn((Person, Name("Renzo Hume".to_string())));
-    commands.spawn((Person, Name("Zayna Nieves".to_string())));
-}
-
-fn hello_world(timer: ResMut<GreetTimer>) {
-    if timer.0.just_finished() {
-        println!("hello world!");
-    }
-}
-
-fn update_people(mut query: Query<&mut Name, With<Person>>) {
-    for mut name in &mut query {
-        if name.0 == "Elaina Proctor" {
-            name.0 = "Elaina Hume".to_string();
-            break;
-        }
-    }
-}
-
-fn greet_people(time: Res<Time>, mut timer: ResMut<GreetTimer>, query: Query<&Name, With<Person>>) {
-    if timer.0.tick(time.delta()).just_finished() {
-        for name in &query {
-            println!("hello {}!", name.0);
-        }
+// Generic system that takes a component as a parameter, and will despawn all entities with that component
+fn despawn_screen<T: Component>(to_despawn: Query<Entity, With<T>>, mut commands: Commands) {
+    for entity in &to_despawn {
+        commands.entity(entity).despawn_recursive();
     }
 }
