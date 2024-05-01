@@ -1,17 +1,13 @@
-mod game;
 mod menu;
 mod splash;
 
 use bevy::prelude::*;
-
-const TEXT_COLOR: Color = Color::rgb(0.9, 0.9, 0.9);
 
 #[derive(Clone, Copy, Default, Eq, PartialEq, Debug, Hash, States)]
 enum GameState {
     #[default]
     Splash,
     Menu,
-    Game,
 }
 
 fn main() {
@@ -19,7 +15,7 @@ fn main() {
         .add_plugins(DefaultPlugins)
         .init_state::<GameState>()
         .add_systems(Startup, setup)
-        .add_plugins((splash::plugin, menu::plugin, game::plugin))
+        .add_plugins((splash::plugin, menu::plugin))
         .run();
 }
 
