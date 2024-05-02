@@ -23,6 +23,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                 style: Style {
                     align_items: AlignItems::Center,
                     justify_content: JustifyContent::Center,
+                    flex_direction: FlexDirection::Column,
                     width: Val::Percent(100.0),
                     height: Val::Percent(100.0),
                     ..default()
@@ -32,35 +33,23 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             OnSplashScreen,
         ))
         .with_children(|parent| {
-            parent
-                .spawn(NodeBundle {
-                    style: Style {
-                        flex_direction: FlexDirection::Column,
-                        align_items: AlignItems::Center,
-                        ..default()
-                    },
+            parent.spawn(ImageBundle {
+                style: Style {
+                    width: Val::Px(200.0),
+                    bottom: Val::Px(50.0),
                     ..default()
-                })
-                .with_children(|parent| {
-                    parent.spawn(ImageBundle {
-                        style: Style {
-                            width: Val::Px(200.0),
-                            bottom: Val::Px(50.0),
-                            ..default()
-                        },
-                        image: UiImage::new(icon),
-                        ..default()
-                    });
-                })
-                .with_children(|parent| {
-                    parent.spawn(TextBundle::from_section(
-                        "Made with Bevy",
-                        TextStyle {
-                            font_size: 30.0,
-                            ..default()
-                        },
-                    ));
-                });
+                },
+                image: UiImage::new(icon),
+                ..default()
+            });
+
+            parent.spawn(TextBundle::from_section(
+                "Made with Bevy",
+                TextStyle {
+                    font_size: 30.0,
+                    ..default()
+                },
+            ));
         });
 
     commands.insert_resource(SplashTimer(Timer::from_seconds(1.0, TimerMode::Once)));

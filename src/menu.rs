@@ -4,30 +4,22 @@ use bevy::prelude::*;
 const TEXT_COLOR: Color = Color::rgb(0.9, 0.9, 0.9);
 
 pub fn plugin(app: &mut App) {
-    app.init_state::<MenuState>()
-        .add_systems(OnEnter(GameState::Menu), setup)
-        .add_systems(OnEnter(MenuState::Main), main_menu_setup)
-        .add_systems(OnExit(MenuState::Main), despawn_screen::<OnMainMenuScreen>);
-}
-
-#[derive(Clone, Copy, Default, Eq, PartialEq, Debug, Hash, States)]
-enum MenuState {
-    Main,
-    #[default]
-    Disabled,
+    app.add_systems(OnEnter(GameState::Menu), setup)
+        .add_systems(OnExit(GameState::Menu), despawn_screen::<OnMenuScreen>);
 }
 
 #[derive(Component)]
-struct OnMainMenuScreen;
+struct OnMenuScreen;
 
-#[derive(Component)]
-struct SelectedOption;
+fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
+    let borders = asset_server.load("./panel-border.png");
+    let borders_slicer = TextureSlicer {
+        border: BorderRect::square(22.0),
+        center_scale_mode: SliceScaleMode::Stretch,
+        sides_scale_mode: SliceScaleMode::Stretch,
+        max_corner_scale: 1.0,
+    };
 
-fn setup(mut menu_state: ResMut<NextState<MenuState>>) {
-    menu_state.set(MenuState::Main);
-}
-
-fn main_menu_setup(mut commands: Commands) {
     commands
         .spawn((
             NodeBundle {
@@ -35,29 +27,90 @@ fn main_menu_setup(mut commands: Commands) {
                     width: Val::Percent(100.0),
                     height: Val::Percent(100.0),
                     align_items: AlignItems::Center,
-                    justify_content: JustifyContent::Center,
                     flex_direction: FlexDirection::Column,
                     ..default()
                 },
-                background_color: Color::DARK_GREEN.into(),
                 ..default()
             },
-            OnMainMenuScreen,
+            OnMenuScreen,
         ))
         .with_children(|parent| {
             parent.spawn(
                 TextBundle::from_section(
                     "Froggy's adventures",
                     TextStyle {
-                        font_size: 80.0,
+                        font_size: 60.0,
                         color: TEXT_COLOR,
                         ..default()
                     },
                 )
                 .with_style(Style {
-                    margin: UiRect::all(Val::Px(50.0)),
+                    margin: UiRect {
+                        top: Val::Px(40.0),
+                        bottom: Val::Px(20.0),
+                        ..default()
+                    },
                     ..default()
                 }),
             );
+
+            parent
+                .spawn(NodeBundle {
+                    style: Style {
+                        height: Val::Percent(100.0),
+                        margin: UiRect {
+                            top: Val::Px(40.0),
+                            bottom: Val::Px(40.0),
+                            ..default()
+                        },
+                        ..default()
+                    },
+                    ..default()
+                })
+                .with_children(|parent| {
+                    parent.spawn((
+                        ImageBundle {
+                            image: borders.clone().into(),
+                            style: Style {
+                                height: Val::Vh(60.0),
+                                width: Val::Vw(40.0),
+                                ..default()
+                            },
+                            ..default()
+                        },
+                        ImageScaleMode::Sliced(borders_slicer.clone()),
+                    ));
+                });
+
+            parent
+                .spawn(NodeBundle {
+                    style: Style {
+                        width: Val::Percent(100.0),
+                        ..default()
+                    },
+                    ..default()
+                })
+                .with_children(|parent| {
+                    parent.spawn(
+                        TextBundle::from_section(
+                            format!("version {}", env!("CARGO_PKG_VERSION")),
+                            TextStyle {
+                                font_size: 20.0,
+                                color: TEXT_COLOR,
+                                ..default()
+                            },
+                        )
+                        .with_style(Style {
+                            position_type: PositionType::Absolute,
+                            margin: UiRect {
+                                top: Val::Px(20.0),
+                                right: Val::Px(20.0),
+                                ..default()
+                            },
+                            right: Val::Px(0.0),
+                            ..default()
+                        }),
+                    );
+                });
         });
 }
