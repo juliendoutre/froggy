@@ -33,6 +33,7 @@ jobs:
       - run: wasm-bindgen --no-typescript --target web --out-dir ./build/ --out-name froggy ./target/wasm32-unknown-unknown/release/froggy.wasm
       - run: wasm-opt ./build/froggy_bg.wasm -o ./build/froggy_bg.wasm -Oz
       - run: cp ./www/index.html ./build/index.html
+      - run: cp -r ./assets ./build/assets
       - uses: actions/configure-pages@v4
       - uses: actions/upload-pages-artifact@v3
         with:
