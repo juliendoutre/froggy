@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         with:
           path: |
             ~/.cargo/bin/
@@ -34,7 +34,7 @@ jobs:
       - run: wasm-opt ./build/froggy_bg.wasm -o ./build/froggy_bg.wasm -Oz
       - run: cp ./www/index.html ./build/index.html
       - run: cp -r ./assets ./build/assets
-      - uses: actions/configure-pages@v4
+      - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
           path: ./build
