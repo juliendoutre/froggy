@@ -1,11 +1,22 @@
 use crate::{despawn_screen, GameState};
-use bevy::prelude::*;
+use bevy::{app::AppExit, prelude::*};
 
 const TEXT_COLOR: Color = Color::rgb(0.9, 0.9, 0.9);
 
 pub fn plugin(app: &mut App) {
     app.add_systems(OnEnter(GameState::Menu), setup)
+        .add_systems(
+            Update,
+            (button_looking, button_action).run_if(in_state(GameState::Menu)),
+        )
         .add_systems(OnExit(GameState::Menu), despawn_screen::<OnMenuScreen>);
+}
+
+// All actions that can be triggered from a button click.
+#[derive(Component)]
+enum MenuButtonAction {
+    Play,
+    Quit,
 }
 
 #[derive(Component)]
@@ -56,7 +67,10 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
 
             parent
                 .spawn(NodeBundle {
+                    z_index: ZIndex::Global(-1),
                     style: Style {
+                        align_items: AlignItems::Center,
+                        flex_direction: FlexDirection::Column,
                         height: Val::Percent(100.0),
                         margin: UiRect {
                             top: Val::Px(40.0),
@@ -71,6 +85,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                     parent.spawn((
                         ImageBundle {
                             image: borders.clone().into(),
+                            z_index: ZIndex::Global(-1),
                             style: Style {
                                 height: Val::Vh(60.0),
                                 width: Val::Vw(40.0),
@@ -80,6 +95,66 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                         },
                         ImageScaleMode::Sliced(borders_slicer.clone()),
                     ));
+
+                    parent
+                        .spawn(NodeBundle {
+                            style: Style {
+                                position_type: PositionType::Absolute,
+                                height: Val::Percent(80.0),
+                                justify_content: JustifyContent::Center,
+                                align_content: AlignContent::Center,
+                                flex_direction: FlexDirection::Column,
+                                ..default()
+                            },
+                            ..default()
+                        })
+                        .with_children(|parent| {
+                            parent
+                                .spawn((
+                                    ButtonBundle {
+                                        background_color: Color::NONE.into(),
+                                        style: Style {
+                                            margin: UiRect::all(Val::Px(30.0)),
+                                            ..default()
+                                        },
+                                        ..default()
+                                    },
+                                    MenuButtonAction::Play,
+                                ))
+                                .with_children(|parent| {
+                                    parent.spawn(TextBundle::from_section(
+                                        "Play",
+                                        TextStyle {
+                                            font_size: 40.0,
+                                            color: TEXT_COLOR,
+                                            ..default()
+                                        },
+                                    ));
+                                });
+
+                            parent
+                                .spawn((
+                                    ButtonBundle {
+                                        background_color: Color::NONE.into(),
+                                        style: Style {
+                                            margin: UiRect::all(Val::Px(30.0)),
+                                            ..default()
+                                        },
+                                        ..default()
+                                    },
+                                    MenuButtonAction::Quit,
+                                ))
+                                .with_children(|parent| {
+                                    parent.spawn(TextBundle::from_section(
+                                        "Quit",
+                                        TextStyle {
+                                            font_size: 40.0,
+                                            color: TEXT_COLOR,
+                                            ..default()
+                                        },
+                                    ));
+                                });
+                        });
                 });
 
             parent
@@ -113,4 +188,44 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                     );
                 });
         });
+}
+
+fn button_looking(
+    mut interaction_query: Query<&Interaction, (Changed<Interaction>, With<Button>)>,
+) {
+    for interaction in &mut interaction_query {
+        match *interaction {
+            Interaction::Hovered => {
+                //
+            }
+            Interaction::None => {
+                //
+            }
+            Interaction::Pressed => {
+                //
+            }
+        }
+    }
+}
+
+fn button_action(
+    interaction_query: Query<
+        (&Interaction, &MenuButtonAction),
+        (Changed<Interaction>, With<Button>),
+    >,
+    mut app_exit_events: EventWriter<AppExit>,
+    mut game_state: ResMut<NextState<GameState>>,
+) {
+    for (interaction, menu_button_action) in &interaction_query {
+        if *interaction == Interaction::Pressed {
+            match menu_button_action {
+                MenuButtonAction::Quit => {
+                    app_exit_events.send(AppExit);
+                }
+                MenuButtonAction::Play => {
+                    game_state.set(GameState::Game);
+                }
+            }
+        }
+    }
 }

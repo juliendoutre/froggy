@@ -8,6 +8,7 @@ enum GameState {
     #[default]
     Splash,
     Menu,
+    Game,
 }
 
 fn main() {
