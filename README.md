@@ -4,6 +4,8 @@
 
 A video game written in Rust with [Bevy](https://bevyengine.org/).
 
+Assets come from https://www.kenney.nl.
+
 Check the online version at https://juliendoutre.github.io/froggy.
 
 ## Run locally
