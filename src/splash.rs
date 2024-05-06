@@ -15,7 +15,7 @@ struct OnSplashScreen;
 struct SplashTimer(Timer);
 
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
-    let icon = asset_server.load("icon.png");
+    let icon = asset_server.load("bevy-icon.png");
 
     commands
         .spawn((
