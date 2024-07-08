@@ -16,7 +16,7 @@ publish = false
 resolver = "2"
 
 [dependencies]
-bevy = "0.13.2"
+bevy = "0.14.0"
 
 [build-dependencies]
 wasm-bindgen-cli = "0.2.92"
