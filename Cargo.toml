@@ -19,7 +19,7 @@ resolver = "2"
 bevy = "0.14.2"
 
 [build-dependencies]
-wasm-bindgen-cli = "0.2.93"
+wasm-bindgen-cli = "0.2.105"
 wasm-opt = "0.116.1"
 
 # Enable a small amount of optimization in debug mode
