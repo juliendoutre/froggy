@@ -35,7 +35,7 @@ jobs:
       - run: cp ./www/index.html ./build/index.html
       - run: cp -r ./assets ./build/assets
       - uses: actions/configure-pages@v6
-      - uses: actions/upload-pages-artifact@v4
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: ./build
   deploy:
